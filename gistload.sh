@@ -4,7 +4,7 @@ username=$1
 gitdir=$2
 
 function usage() {
-  echo "Usage: gistload.sh <git-username> <local-git-repo>"
+  echo "Usage: gistload.sh <git-username> <dir>"
   exit 1
 }
 
