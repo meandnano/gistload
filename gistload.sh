@@ -28,7 +28,7 @@ function main() {
 
     sleep 1
 
-    curl -s --tlsv1.2 --connect-timeout 5 -o "$filename" "$url"
+    curl -s -f --tlsv1.2 --connect-timeout 5 -o "$filename" "$url"
     if [ $? -ne 0 ]; then
       echo "error downloading $url"
       exit 1
