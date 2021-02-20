@@ -3,12 +3,24 @@
 username=$1
 gitdir=$2
 
-function usage() {
+function usage {
   echo "Usage: gistload.sh <git-username> <dir>"
   exit 1
 }
 
-function main() {
+function ensureRepoClean {
+  if [ ! -d "$gitdir/.git" ]; then return 1; fi
+  if ! which git > /dev/null; then return 1; fi
+
+  if [ -n "$(git -C "$gitdir" status --porcelain)" ]; then
+    echo "$gitdir repo has uncommitted changes, exiting to not break anything"
+    exit 1
+  else
+    return 0
+  fi
+}
+
+function main {
   mkdir -p "$gitdir" && cd "$gitdir" || exit 1
 
   echo "Downloading gists files to $gitdir"
@@ -54,22 +66,21 @@ if [ -f "$gitdir" ]; then
   exit 1
 fi
 
-if [ -d "$gitdir" ] && [ -n "$(ls "$gitdir")" ]; then
-  if [ -d "$gitdir/.git" ] && [ -n "$(git -C "$gitdir" status --porcelain)" ]; then
-    echo "$gitdir repo has uncommitted changes, exiting to not break anything"
-    exit 1
+if [ -d "$gitdir" ] && [ -n "$(ls -a "$gitdir")" ]; then
+  if ensureRepoClean; then
+    main
+  else
+    echo "$gitdir is not empty, its content might get overwritten, proceed?"
+    select yn in "Yes" "No"; do
+      case $yn in
+      Yes)
+        main
+        break
+        ;;
+      No) exit 0 ;;
+      esac
+    done
   fi
-
-  echo "$gitdir is not empty, its content might get overwritten, proceed?"
-  select yn in "Yes" "No"; do
-    case $yn in
-    Yes)
-      main
-      break
-      ;;
-    No) exit 0 ;;
-    esac
-  done
 else
   main
 fi

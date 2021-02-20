@@ -15,6 +15,6 @@ In case target dir exists, is a git repo and contains unstaged changes, download
 ### Requirements
 
 - bash 4+
-- git
 - jq
 - curl
+- (optional) git
